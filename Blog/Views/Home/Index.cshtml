@@ -1,0 +1,102 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@model Blog.Models.ViewModel.HomeIndexViewModel
+
+@{
+    ViewData["Title"] = "Blog";
+}
+
+@section Style
+{
+    <link href="~/css/Home/index.css" rel="stylesheet" />
+}
+
+@section  Scripts
+{
+    <script src="~/js/Home/index.js"></script>
+}
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <a asp-controller="Post" asp-action="Create">Create New</a>
+}
+
+<form asp-controller="Home" asp-action="Index" method="get">
+    <div class="form-group mt-3">
+        <p>
+            Search:
+            <input type="text" name="searchFilter" value="@Model.SearchFilter" />
+            <input type="submit" value="Search" class="btn btn-outline-success" />
+        </p>
+    </div>
+</form>
+
+<h3 class="my-3">Posts</h3>
+<div>
+    @foreach (var post in Model.Posts)
+    {
+        @if (post.Type == "Text")
+        {
+            <div class="PostBlock" id="@post.PostId">
+                <div class="float-left mr-5">
+                    <p class="arrow up @Model.UserUpvoted(post.PostId)">&uarr;</p>
+                    <p class="score">@post.Votes.Sum(v => v.Dir)</p>
+                    <p class="arrow down @Model.UserDownvoted(post.PostId)">&darr;</p>
+                </div>
+                <div>
+                    <h5>@Html.DisplayFor(p => post.Title)</h5>
+                    <small>@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
+                    <p class="mb-5">@Html.DisplayFor(p => post.Content)</p>
+                </div>
+            </div>
+        }
+        else if (post.Type == "Image")
+        {
+            <div class="PostBlock" id="@post.PostId">
+                <div class="float-left mr-5">
+                    <p class="arrow up @Model.UserUpvoted(post.PostId)">&uarr;</p>
+                    <p class="score">@post.Votes.Sum(v => v.Dir)</p>
+                    <p class="arrow down @Model.UserDownvoted(post.PostId)">&darr;</p>
+                </div>
+                <div>
+                    <h5>@Html.DisplayFor(p => post.Title)</h5>
+                    <small>@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
+                    <img class="img-fluid mb-2" src="@(post.Content)"/>
+                </div>
+            </div>
+        }
+
+    }
+</div>
+
+
+@{
+    var prevDisabled = !Model.Posts.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.Posts.HasNextPage ? "disabled" : "";
+}
+
+
+
+<a asp-action="Index"
+   asp-route-pageIndex="@(Model.Posts.PageIndex - 1)"
+   class="@prevDisabled mr-1">
+    Previous
+</a>
+<p class="d-inline">@Model.Posts.PageIndex / @Model.Posts.TotalPages</p>
+<a asp-action="Index"
+   asp-route-pageIndex="@(Model.Posts.PageIndex + 1)"
+   class="@nextDisabled ml-1">
+    Next
+</a>
+
+<div class="fixed-bottom text-center text-warning bg-dark py-2 opacity-0 border-secondary"
+     id="VoteAuthWarning"
+     onclick="closeWarningBox()">
+    <button type="button" class="close text-warning" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    You must be logged in to vote on posts!
+</div>

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>aspnet-Blog-07B4AC0A-0595-4DD5-A72B-5A4B04312272</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\lib\bootstrap\**" />
+    <Compile Remove="wwwroot\lib\jquery\**" />
+    <Content Remove="wwwroot\lib\bootstrap\**" />
+    <Content Remove="wwwroot\lib\jquery\**" />
+    <EmbeddedResource Remove="wwwroot\lib\bootstrap\**" />
+    <EmbeddedResource Remove="wwwroot\lib\jquery\**" />
+    <None Remove="wwwroot\lib\bootstrap\**" />
+    <None Remove="wwwroot\lib\jquery\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20180722001226_IdentityCustom.cs" />
+    <Compile Remove="Data\Migrations\20180722001226_IdentityCustom.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180722003847_DuplicateFix.cs" />
+    <Compile Remove="Data\Migrations\20180722003847_DuplicateFix.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180722004319_PleaseFixThanks.cs" />
+    <Compile Remove="Data\Migrations\20180722004319_PleaseFixThanks.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180722004448_oknowfix.cs" />
+    <Compile Remove="Data\Migrations\20180722004448_oknowfix.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180722004542_pleasefixnow.cs" />
+    <Compile Remove="Data\Migrations\20180722004542_pleasefixnow.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180722005358_ok.cs" />
+    <Compile Remove="Data\Migrations\20180722005358_ok.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Identity\Services\" />
+    <Folder Include="wwwroot\images\Posts\thumbs\" />
+  </ItemGroup>
+
+</Project>

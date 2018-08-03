@@ -1,0 +1,26 @@
+﻿a.disabled {
+    color: dimgrey;
+    pointer-events: none;
+}
+
+.arrow {
+    cursor: pointer;
+}
+
+.arrow.up.active {
+    color: orangered;
+}
+
+.arrow.down.active {
+    color: mediumpurple;
+}
+
+#VoteAuthWarning {
+    transition-property: all;
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+}
+
+#VoteAuthWarning.opacity-0 {
+    opacity: 0;
+}
