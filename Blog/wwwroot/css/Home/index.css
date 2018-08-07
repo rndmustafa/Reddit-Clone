@@ -24,3 +24,24 @@
 #VoteAuthWarning.opacity-0 {
     opacity: 0;
 }
+
+.expando-button {
+    width: 25px;
+    height: 25px;
+    background-color: lightgrey;
+    border: 1px solid white;
+    border-radius: 3px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+.expando-icon {
+    user-select: none;
+}
+
+.expando-content {
+    border: 2px solid lightgrey;
+    border-radius: 3px;
+    box-shadow: 0px 3px 8px 0px rgba(0,0,0,0.16);
+}

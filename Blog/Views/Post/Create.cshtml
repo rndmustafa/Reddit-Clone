@@ -10,7 +10,7 @@
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
         <a class="nav-item nav-link active" id="nav-text-tab" data-toggle="tab" href="#nav-text" role="tab" aria-controls="nav-text" aria-selected="true">Text</a>
-        <a class="nav-item nav-link" id="nav-link-tab" data-toggle="tab" href="#nav-link" role="tab" aria-controls="nav-link" aria-selected="false">Link</a>
+        <a class="nav-item nav-link" id="nav-upload-tab" data-toggle="tab" href="#nav-upload" role="tab" aria-controls="nav-upload" aria-selected="false">Upload</a>
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <div class="tab-pane fade" id="nav-link" role="tabpanel" aria-labelledby="nav-link-tab">
+    <div class="tab-pane fade" id="nav-upload" role="tabpanel" aria-labelledby="nav-upload-tab">
         <div class="row">
             <div class="col mt-1">
                 <form asp-controller="Post" asp-action="Create" enctype="multipart/form-data">

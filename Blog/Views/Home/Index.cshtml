@@ -35,42 +35,33 @@
 </form>
 
 <h3 class="my-3">Posts</h3>
-<div>
-    @foreach (var post in Model.Posts)
-    {
-        @if (post.Type == "Text")
-        {
-            <div class="PostBlock" id="@post.PostId">
-                <div class="float-left mr-5">
-                    <p class="arrow up @Model.UserUpvoted(post.PostId)">&uarr;</p>
-                    <p class="score">@post.Votes.Sum(v => v.Dir)</p>
-                    <p class="arrow down @Model.UserDownvoted(post.PostId)">&darr;</p>
-                </div>
-                <div>
-                    <h5>@Html.DisplayFor(p => post.Title)</h5>
-                    <small>@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
-                    <p class="mb-5">@Html.DisplayFor(p => post.Content)</p>
-                </div>
+@foreach (var post in Model.Posts)
+{
+    <div class="PostBlock d-flex flex-row" id="@post.PostId">
+        <div class="mr-5">
+            <p class="arrow up @Model.UserUpvoted(post.PostId)">&uarr;</p>
+            <p class="score">@post.Votes.Sum(v => v.Dir)</p>
+            <p class="arrow down @Model.UserDownvoted(post.PostId)">&darr;</p>
+        </div>
+        <div>
+            <h5>@Html.DisplayFor(p => post.Title)</h5>
+            <small>@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
+            <div class="expando-button collapsed d-flex justify-content-center">
+                <span class="expando-icon">&#9655;</span>
             </div>
-        }
-        else if (post.Type == "Image")
-        {
-            <div class="PostBlock" id="@post.PostId">
-                <div class="float-left mr-5">
-                    <p class="arrow up @Model.UserUpvoted(post.PostId)">&uarr;</p>
-                    <p class="score">@post.Votes.Sum(v => v.Dir)</p>
-                    <p class="arrow down @Model.UserDownvoted(post.PostId)">&darr;</p>
-                </div>
-                <div>
-                    <h5>@Html.DisplayFor(p => post.Title)</h5>
-                    <small>@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
-                    <img class="img-fluid mb-2" src="@(post.Content)"/>
-                </div>
+            <div class="expando-content d-none justify-content-center align-content-center">
+                @if(post.Type == "Text")
+                {
+                    <p>@Html.DisplayFor(p => post.Content)</p>
+                }
+                else if(post.Type == "Image")
+                {
+                    <img class="img-fluid" src="@post.Content"/>
+                }
             </div>
-        }
-
-    }
-</div>
+        </div>
+    </div>
+}
 
 
 @{

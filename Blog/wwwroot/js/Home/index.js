@@ -44,3 +44,20 @@ function changeArrowColors(jqueryArrow) {
 function closeWarningBox() {
     $("#VoteAuthWarning").addClass("opacity-0");
 }
+
+
+$(".expando-button").click(function () {
+    let contentDiv = $(this).siblings(".expando-content");
+    if ($(this).hasClass("collapsed")) {
+        $(this).removeClass("collapsed");
+        contentDiv.removeClass("d-none");
+        contentDiv.addClass("d-flex");
+        $(this).children("span").text("X");
+    }
+    else {
+        $(this).addClass("collapsed");
+        contentDiv.addClass("d-none");
+        contentDiv.removeClass("d-flex");
+        $(this).children("span").text("\u25B7");
+    }
+})
