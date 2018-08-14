@@ -28,6 +28,11 @@ namespace Blog.Controllers
             [MaxLength(2000)]
             public string Content { get; set; }
 
+            [MinLength(3)]
+            [MaxLength(2000)]
+            [DataType(DataType.Url)]
+            public string Url { get; set; }
+
             [Display(Name = "File Upload")]
             public IFormFile PictureFile { get; set; }
         }
@@ -94,7 +99,7 @@ namespace Blog.Controllers
                 _context.Post.Add(newPost);
                 _context.SaveChanges();
             }
-            else if (postCreateInputModel.Type == "Link")
+            else if (postCreateInputModel.Type == "Upload")
             {
                 ValidateFormFile(postCreateInputModel.PictureFile, ModelState);
 
@@ -115,9 +120,29 @@ namespace Blog.Controllers
                 {
                     UserId = _userManager.GetUserId(User),
                     Title = postCreateInputModel.Title,
-                    Content = filePath,
+                    Content = "/images/Posts/" + fileName,
                     WhenPosted = DateTime.Now,
                     Type = "Image"
+                };
+                _context.Post.Add(newPost);
+                _context.SaveChanges();
+            }
+            else if(postCreateInputModel.Type == "Link")
+            {
+                string contentType = GetContentType(postCreateInputModel.Url);
+
+                if(contentType == "Video")
+                {
+                    postCreateInputModel.Url = postCreateInputModel.Url.Replace("watch?v=", "embed/");
+                }
+
+                Post newPost = new Post
+                {
+                    UserId = _userManager.GetUserId(User),
+                    Title = postCreateInputModel.Title,
+                    Content = postCreateInputModel.Url,
+                    WhenPosted = DateTime.Now,
+                    Type = contentType
                 };
                 _context.Post.Add(newPost);
                 _context.SaveChanges();
@@ -125,6 +150,25 @@ namespace Blog.Controllers
 
             return RedirectToAction("Index", "Home");
             
+        }
+
+        private string GetContentType(string url)
+        {
+            string[] imageTypes = { ".gif", ".png", ".jpg", ".jpeg" };
+            foreach (string type in imageTypes)
+            {
+                if (url.EndsWith(type))
+                {
+                    return "Image";
+                }
+            }
+
+            if(url.Contains("youtube.com"))
+            {
+                return "Video";
+            }
+
+            return "Other";
         }
 
         private void ValidateFormFile(IFormFile pictureFile, ModelStateDictionary modelState)

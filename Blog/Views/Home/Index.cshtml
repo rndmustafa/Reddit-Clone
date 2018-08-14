@@ -58,6 +58,15 @@
                 {
                     <img class="img-fluid" src="@post.Content"/>
                 }
+                else if(post.Type == "Video")
+                {
+                    <iframe width="640" height="480" src="@post.Content" 
+                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                }
+                else
+                {
+                    <p><a class="p-1" href="@post.Content">@post.Content</a></p>
+                }
             </div>
         </div>
     </div>
