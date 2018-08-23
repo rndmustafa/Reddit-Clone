@@ -11,5 +11,6 @@ namespace Blog.Models.DomainModel
 
         public ICollection<Post> Posts { get; set; }
         public IList<Vote> Votes { get; set; }
+        public IList<Comment> Comments { get; set; }
     }
 }

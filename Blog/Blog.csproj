@@ -29,6 +29,8 @@
     <Compile Remove="Data\Migrations\20180722004542_pleasefixnow.Designer.cs" />
     <Compile Remove="Data\Migrations\20180722005358_ok.cs" />
     <Compile Remove="Data\Migrations\20180722005358_ok.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180821005745_CommentRelationships.cs" />
+    <Compile Remove="Data\Migrations\20180821005745_CommentRelationships.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

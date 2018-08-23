@@ -1,0 +1,94 @@
+﻿@model Blog.Models.ViewModel.PostDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Post.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Style
+{
+    <link href="~/css/Home/index.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+    <script src="~/js/Home/index.js"></script>
+    <script src="~/js/Post/Details.js"></script>
+}
+
+
+<div class="PostBlock d-flex flex-row" id="@Model.Post.PostId">
+    <div class="mr-5">
+        <p class="arrow up @Model.UserUpvoted()">&uarr;</p>
+        <p class="score">@Model.Post.Votes.Sum(v => v.Dir)</p>
+        <p class="arrow down @Model.UserDownvoted()">&darr;</p>
+    </div>
+    <div>
+        <h5>@Html.DisplayFor(p => Model.Post.Title)</h5>
+        <small class="d-block">@Html.DisplayFor(p => Model.Post.User.UserName) -- @Html.DisplayFor(p => Model.Post.WhenPosted)</small>
+        <div class="expando-button collapsed d-inline-flex justify-content-center">
+            <span class="expando-icon">&#9655;</span>
+        </div>
+        <div class="expando-content d-none justify-content-center align-content-center">
+            @if (Model.Post.Type == "Text")
+            {
+                <p>@Html.DisplayFor(p => Model.Post.Content)</p>
+            }
+            else if (Model.Post.Type == "Image")
+            {
+                <img class="img-fluid" src="@Model.Post.Content" />
+            }
+            else if (Model.Post.Type == "Video")
+            {
+                <iframe width="640" height="480" src="@Model.Post.Content"
+                        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+            }
+            else
+            {
+                <p><a class="p-1" href="@Model.Post.Content">@Model.Post.Content</a></p>
+            }
+        </div>
+    </div>
+</div>
+
+<h4>Comments</h4>
+<hr />
+@if (Model.SignInManager.IsSignedIn(User))
+{
+    <form asp-controller="Post" asp-action="Details" class="mb-5" id="CommentForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="CommentContent" class="control-label d-block">Comment</label>
+            <textarea asp-for="CommentContent" rows="5" cols="50"></textarea>
+            <span asp-validation-for="CommentContent" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Submit" class="btn"/>
+        </div>
+    </form>
+}
+
+@foreach(var comment in Model.GetTopLevelComments())
+{
+    <div class="CommentBlock d-flex flex-row border p-2" id="@comment.CommentId">
+        <div class="mr-5">
+            <p class="arrow up">&uarr;</p>
+            <p class="score">0</p> 
+            <p class="arrow down">&darr;</p>
+        </div>
+        <div class="d-flex flex-column">
+            <small>@comment.User.UserName @comment.WhenPosted</small>
+            <p>@comment.Content</p>
+            <small class="text-muted">parent reply</small>
+        </div>
+    </div>
+}
+
+<div class="fixed-bottom text-center text-warning bg-dark py-2 opacity-0 border-secondary"
+     id="VoteAuthWarning"
+     onclick="closeWarningBox()">
+    <button type="button" class="close text-warning" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    You must be logged in to vote on posts!
+</div>

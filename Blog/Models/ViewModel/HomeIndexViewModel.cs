@@ -12,7 +12,6 @@ namespace Blog.Models.ViewModel
         public PaginatedList<Post> Posts;
         public string SearchFilter;
         public Dictionary<int, int> UserVote = new Dictionary<int, int>();
-        public string ImageFilePath = "~\\images\\Posts\\";
 
         public void CalculateCurrentUserVotes(string userId)
         {

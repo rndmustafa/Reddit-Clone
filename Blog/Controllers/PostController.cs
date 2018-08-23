@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Blog.Models.ViewModel;
+using Microsoft.EntityFrameworkCore;
+using Blog.Models;
+using System.Diagnostics;
 
 namespace Blog.Controllers
 {
@@ -39,11 +43,15 @@ namespace Blog.Controllers
 
         private readonly UserManager<IdentityUser> _userManager;
         private readonly Blog.Data.ApplicationDbContext _context;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public PostController(UserManager<IdentityUser> userManager, Blog.Data.ApplicationDbContext context)
+        public PostController(UserManager<IdentityUser> userManager, 
+            Blog.Data.ApplicationDbContext context,
+            SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
             _context = context;
+            _signInManager = signInManager;
         }
 
         // GET: Post
@@ -53,9 +61,48 @@ namespace Blog.Controllers
         }
 
         // GET: Post/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int id, int pageIndex)
         {
-            return View();
+            Post post = _context.Post
+                .Include(p => p.User)
+                .Include(p => p.Votes)
+                .Where(p => p.PostId == id)
+                .AsNoTracking()
+                .SingleOrDefault();
+
+            if(post == null)
+            {
+                return StatusCode(404);
+            }
+
+            pageIndex = pageIndex == 0 ? 1 : pageIndex;
+
+            PostDetailsViewModel model = new PostDetailsViewModel(_context,
+                _signInManager,
+                post, 
+                _userManager.GetUserId(User),
+                pageIndex);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public ActionResult Details(int id, string commentContent)
+        {
+            Comment newComment = new Comment
+            {
+                PostId = id,
+                UserId = _userManager.GetUserId(User),
+                Content = commentContent,
+                WhenPosted = DateTime.Now
+            };
+
+            _context.Comment.Add(newComment);
+            _context.SaveChanges();
+
+            return RedirectToAction("Details", "Post", id);
         }
 
         // GET: Post/Create
@@ -231,6 +278,12 @@ namespace Blog.Controllers
             {
                 return View();
             }
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -10,10 +10,11 @@
     vote($(this), postId,dir);
 });
 
+
 function vote(jqueryArrow, postId, dir) {
     $.ajax({
         type: "GET",
-        url: "Home/Vote",
+        url: "/Home/Vote",
         data: {postId, dir},
         contentType: "application/json",
         dataType: "json",
