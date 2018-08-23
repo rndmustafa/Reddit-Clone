@@ -27,5 +27,6 @@ namespace Blog.Models.DomainModel
 
         public User User { get; set; }
         public IList<Vote> Votes { get; set; }
+        public IList<Comment> Comments { get; set; }
     }
 }

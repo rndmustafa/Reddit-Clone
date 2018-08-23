@@ -10,12 +10,12 @@
 }
 
 @section Style
-{
+    {
     <link href="~/css/Home/index.css" rel="stylesheet" />
 }
 
-@section  Scripts
-{
+@section Scripts
+    {
     <script src="~/js/Home/index.js"></script>
 }
 
@@ -45,22 +45,23 @@
         </div>
         <div>
             <h5>@Html.DisplayFor(p => post.Title)</h5>
-            <small>@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
-            <div class="expando-button collapsed d-flex justify-content-center">
+            <small class="d-block">@Html.DisplayFor(p => post.User.UserName) -- @Html.DisplayFor(p => post.WhenPosted)</small>
+            <div class="expando-button collapsed d-inline-flex justify-content-center">
                 <span class="expando-icon">&#9655;</span>
             </div>
+            <a asp-controller="Post" asp-action="Details" asp-route-id="@post.PostId"><span class="text-muted viewcomments">View Comments</span></a>
             <div class="expando-content d-none justify-content-center align-content-center">
-                @if(post.Type == "Text")
+                @if (post.Type == "Text")
                 {
                     <p>@Html.DisplayFor(p => post.Content)</p>
                 }
-                else if(post.Type == "Image")
+                else if (post.Type == "Image")
                 {
-                    <img class="img-fluid" src="@post.Content"/>
+                    <img class="img-fluid" src="@post.Content" />
                 }
-                else if(post.Type == "Video")
+                else if (post.Type == "Video")
                 {
-                    <iframe width="640" height="480" src="@post.Content" 
+                    <iframe width="640" height="480" src="@post.Content"
                             frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 }
                 else
