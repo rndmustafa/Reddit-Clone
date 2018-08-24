@@ -15,6 +15,8 @@ using Blog.Models.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Blog.Models;
 using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace Blog.Controllers
 {
@@ -61,7 +63,7 @@ namespace Blog.Controllers
         }
 
         // GET: Post/Details/5
-        public ActionResult Details(int id, int pageIndex)
+        public ActionResult Details(int id)
         {
             Post post = _context.Post
                 .Include(p => p.User)
@@ -75,13 +77,10 @@ namespace Blog.Controllers
                 return StatusCode(404);
             }
 
-            pageIndex = pageIndex == 0 ? 1 : pageIndex;
-
             PostDetailsViewModel model = new PostDetailsViewModel(_context,
                 _signInManager,
                 post, 
-                _userManager.GetUserId(User),
-                pageIndex);
+                _userManager.GetUserId(User));
 
             return View(model);
         }
@@ -103,6 +102,21 @@ namespace Blog.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Details", "Post", id);
+        }
+
+        public IActionResult LoadTopComments(int postId, int topCommentPage)
+        {
+            Dictionary<string, string> json = new Dictionary<string, string>();
+
+            IQueryable<Comment> commentsIQ = _context.Comment
+                .Include( c => c.User )
+                .Where(c => c.PostId == postId && c.ParentCommentId == null)
+                .AsNoTracking();
+            PaginatedList<Comment> comments = new PaginatedList<Comment>(commentsIQ, topCommentPage, 10);
+
+            json.Add("comments", PostDetailsViewModel.Serialize(comments));
+            json.Add("hasNextPage", comments.HasNextPage.ToString());
+            return new JsonResult(json);
         }
 
         // GET: Post/Create

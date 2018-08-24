@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace Blog.Models.ViewModel
 {
@@ -15,8 +16,7 @@ namespace Blog.Models.ViewModel
         public Post Post { get; set; }
         public Vote Vote { get; set; }
         public SignInManager<IdentityUser> SignInManager { get; set; }
-        public IQueryable<Comment> CommentsIQ { get; set; }
-        public int PageIndex { get; set; }
+        public PaginatedList<Comment> Comments { get; set; }
 
         [MinLength(1)]
         public string CommentContent { get; set; }
@@ -24,20 +24,19 @@ namespace Blog.Models.ViewModel
         public PostDetailsViewModel(ApplicationDbContext _context,
                                     SignInManager<IdentityUser> _signInManager,
                                     Post post, 
-                                    string userId,
-                                    int pageIndex)
+                                    string userId)
         {
             Post = post;
-            CommentsIQ = _context.Comment.Include(c => c.User).Where(c => c.PostId == Post.PostId);
+            IQueryable<Comment> commentsIQ = _context.Comment.Include(c => c.User).Where(c => c.PostId == Post.PostId);
+            Comments = GetTopLevelComments(commentsIQ);
             Vote = _context.Vote.Where(v => v.PostId == Post.PostId && v.UserId == userId).SingleOrDefault();
             SignInManager = _signInManager;
-            PageIndex = pageIndex;
         }
 
-        public PaginatedList<Comment> GetTopLevelComments()
+        public PaginatedList<Comment> GetTopLevelComments(IQueryable<Comment> commentsIQ)
         {
-            IQueryable<Comment> topCommentsIQ = CommentsIQ.Where(c => c.ParentCommentId == null);
-            return new PaginatedList<Comment>(topCommentsIQ, PageIndex, 10);
+            IQueryable<Comment> topCommentsIQ = commentsIQ.Where(c => c.ParentCommentId == null);
+            return new PaginatedList<Comment>(topCommentsIQ, 1, 10);
         }
 
         public string UserUpvoted()
@@ -56,6 +55,27 @@ namespace Blog.Models.ViewModel
                 return "active";
             }
             return "";
+        }
+
+        public static string Serialize(PaginatedList<Comment> comments)
+        {
+            StringBuilder result = new StringBuilder();
+            result.Append("[");
+            for (int i = 0; i < comments.Count; i++)
+            {
+                result.Append("{");
+                result.Append($"'commentId': '{comments[i].CommentId}',");
+                result.Append($"'userName': '{comments[i].User.UserName}',");
+                result.Append($"'whenPosted': '{comments[i].WhenPosted}',");
+                result.Append($"'content': '{comments[i].Content}'");
+                result.Append("}");
+                if (i != comments.Count - 1)
+                {
+                    result.Append(",");
+                }
+            }
+            result.Append("]");
+            return result.ToString();
         }
 
     }
