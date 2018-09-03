@@ -17,6 +17,8 @@ namespace Blog.Models.ViewModel
         public Vote Vote { get; set; }
         public SignInManager<IdentityUser> SignInManager { get; set; }
         public PaginatedList<Comment> Comments { get; set; }
+        public ApplicationDbContext Context { get; set; }
+        private const int MaxDepth = 3;
 
         [MinLength(1)]
         public string CommentContent { get; set; }
@@ -26,9 +28,18 @@ namespace Blog.Models.ViewModel
                                     Post post, 
                                     string userId)
         {
+            Context = _context;
             Post = post;
-            IQueryable<Comment> commentsIQ = _context.Comment.Include(c => c.User).Where(c => c.PostId == Post.PostId);
+
+            IQueryable<Comment> commentsIQ = _context.Comment
+                .Include(c => c.User)
+                .Where(c => c.PostId == Post.PostId);
             Comments = GetTopLevelComments(commentsIQ);
+            foreach(Comment c in Comments)
+            {
+                LoadChildComments(Context,c,0);
+            }
+
             Vote = _context.Vote.Where(v => v.PostId == Post.PostId && v.UserId == userId).SingleOrDefault();
             SignInManager = _signInManager;
         }
@@ -37,6 +48,25 @@ namespace Blog.Models.ViewModel
         {
             IQueryable<Comment> topCommentsIQ = commentsIQ.Where(c => c.ParentCommentId == null);
             return new PaginatedList<Comment>(topCommentsIQ, 1, 10);
+        }
+
+        public static void LoadChildComments(ApplicationDbContext context, Comment comment, int depth)
+        {
+            if(depth + 1 < MaxDepth)
+            {
+                comment.ChildComments = context.Comment
+                    .Include(c => c.User)
+                    .Where(c => c.ParentCommentId == comment.CommentId)
+                    .AsNoTracking()
+                    .ToList();
+                if(comment.ChildComments != null)
+                {
+                    foreach(Comment child in comment.ChildComments)
+                    {
+                        LoadChildComments(context, child, depth + 1);
+                    }
+                }
+            }
         }
 
         public string UserUpvoted()
@@ -63,12 +93,7 @@ namespace Blog.Models.ViewModel
             result.Append("[");
             for (int i = 0; i < comments.Count; i++)
             {
-                result.Append("{");
-                result.Append($"'commentId': '{comments[i].CommentId}',");
-                result.Append($"'userName': '{comments[i].User.UserName}',");
-                result.Append($"'whenPosted': '{comments[i].WhenPosted}',");
-                result.Append($"'content': '{comments[i].Content}'");
-                result.Append("}");
+                AppendComment(result, comments[i]);
                 if (i != comments.Count - 1)
                 {
                     result.Append(",");
@@ -78,5 +103,33 @@ namespace Blog.Models.ViewModel
             return result.ToString();
         }
 
+        private static void AppendComment(StringBuilder result, Comment comment)
+        {
+            result.Append("{");
+            result.Append($"\"commentId\": \"{comment.CommentId}\",");
+            result.Append($"\"userName\": \"{comment.User.UserName}\",");
+            result.Append($"\"whenPosted\": \"{comment.WhenPosted}\",");
+            result.Append($"\"content\": \"{comment.Content}\",");
+
+            if(comment.ChildComments != null)
+            {
+                result.Append("\"childComments\": [");
+                for (int i = 0; i < comment.ChildComments.Count; i++)
+                {
+                    AppendComment(result, comment.ChildComments[i]);
+                    if (i != comment.ChildComments.Count - 1)
+                    {
+                        result.Append(",");
+                    }
+                }
+                result.Append("]");
+            }
+            else
+            {
+                result.Append("\"childComments\": \"[]\"");
+            }
+
+            result.Append("}");
+        }
     }
 }

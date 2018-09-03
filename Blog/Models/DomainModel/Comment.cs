@@ -18,6 +18,7 @@ namespace Blog.Models.DomainModel
 
         public Post Post { get; set; }
         public Comment ParentComment { get; set; }
+        public IList<Comment> ChildComments { get; set; }
         public User User { get; set; }
     }
 }

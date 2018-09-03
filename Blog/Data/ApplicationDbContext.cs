@@ -18,5 +18,15 @@ namespace Blog.Data
         public DbSet<Post> Post { get; set; }
         public DbSet<Vote> Vote { get; set; }
         public DbSet<Comment> Comment { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<Comment>()
+            .HasOne(c => c.ParentComment)
+            .WithMany(c => c.ChildComments)
+            .HasForeignKey(c => c.ParentCommentId);
+        }
     }
 }

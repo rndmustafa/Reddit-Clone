@@ -113,6 +113,10 @@ namespace Blog.Controllers
                 .Where(c => c.PostId == postId && c.ParentCommentId == null)
                 .AsNoTracking();
             PaginatedList<Comment> comments = new PaginatedList<Comment>(commentsIQ, topCommentPage, 10);
+            foreach(var comment in comments)
+            {
+                PostDetailsViewModel.LoadChildComments(_context, comment, 0);
+            }
 
             json.Add("comments", PostDetailsViewModel.Serialize(comments));
             json.Add("hasNextPage", comments.HasNextPage.ToString());

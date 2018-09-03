@@ -2,24 +2,15 @@
 
 function loadTopComments() {
     topCommentPage += 1;
-    $.ajax({
-        url: "/Post/LoadTopComments/",
-        data: {
-            postId: $(".PostBlock").attr("id"),
-            topCommentPage
-        },
-        success: function (data) {
-            let commentsList = data["comments"].replace(/&quot;/ig, '"');
-            commentsList = commentsList.replace(/'/gi, '"');
-            commentsList = JSON.parse(commentsList);
-
+    fetch(`/Post/LoadTopComments/?postId=${$(".PostBlock").attr("id")}&topCommentPage=${topCommentPage}`)
+        .then(res => res.json())
+        .then((data) => {
+            let commentsList = JSON.parse(data["comments"]);
             AddComments(commentsList, data["hasNextPage"]);
-        },
-        error: function (jqXHR, textStatus) {
-            console.log(jqXHR);
-            console.log(textStatus);
-        }
-    });
+        })
+        .catch(error => {
+            console.log(error);
+        })
 }
 
 function AddComments(commentsList, hasNextPage) {
@@ -28,7 +19,14 @@ function AddComments(commentsList, hasNextPage) {
     }
 
     for (comment of commentsList) {
-        let domObject = `
+        let domObject = getDomComment(comment);
+
+        $(".comments").append(domObject);
+    }
+}
+
+function getDomComment(comment) {
+    let domComment = `
           <div class="CommentBlock d-flex flex-row border p-2" id="${comment.commentId}">
             <div class="mr-5">
                 <p class="arrow up">&uarr;</p>
@@ -40,9 +38,17 @@ function AddComments(commentsList, hasNextPage) {
                 <p>${comment.content}</p>
                 <small class="text-muted">parent reply</small>
             </div>
-        </div>
-            `;
+        </div>`;
 
-        $(".comments").append(domObject);
+    if (comment.childComments.length) {
+        domComment += "<ul>"
+        for (let child of comment.childComments) {
+            domComment += "<li>"
+            domComment += getDomComment(child);
+            domComment += "</li>"
+        }
+        domComment += "</ul>"
     }
+
+    return domComment;
 }
